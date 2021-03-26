@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+lib/e-puck2_main-processor/
+
+Scripts_python/
+
+TP4_CamReg/CamReg/.settings/language.settings.xml
