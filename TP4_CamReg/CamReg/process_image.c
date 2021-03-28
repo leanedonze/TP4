@@ -13,7 +13,7 @@
 
 
 static float distance_cm = 0;
-static float pixel_counter = 0;
+static uint16_t pixel_counter = 0;
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
