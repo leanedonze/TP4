@@ -10,7 +10,7 @@
 #include <pi_regulator.h>
 #include <process_image.h>
 
-#define	KP		0
+#define	KP		800
 #define	KI		0
 #define GOAL	10
 
@@ -34,8 +34,8 @@ static THD_FUNCTION(PiRegulator, arg) {
 
         
         //applies the speed from the PI regulator
-		// right_motor_set_speed(speed);
-		// left_motor_set_speed(speed);
+		//right_motor_set_speed(speed);
+		//left_motor_set_speed(speed);
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
