@@ -8,10 +8,12 @@
 
 #include <process_image.h>
 
-#define THRESHOLD	15
+#define PXTOCM		1570
+#define THRESHOLD	20
 
 
 static float distance_cm = 0;
+static float pixel_counter = 0;
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -52,8 +54,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 	uint8_t *img_buff_ptr;
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
-	uint16_t pixel_counter = 0;
-	uint8_t envoi=0;
+
 
     while(1){
     	//waits until an image has been captured
@@ -72,6 +73,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 			if (image[i/2]-image[i/2-1] > 50){
 				pixel_counter = i/2-pixel_counter;
 			}*/
+			//SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 		}
 		/*for (unsigned int i = 0; i < IMAGE_BUFFER_SIZE; ++i){
@@ -83,10 +85,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 				pixel_counter = i - pixel_counter;
 			}
 		}*/
-		if (envoi%4==0)
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-		++envoi;
+
 		chprintf((BaseSequentialStream *)&SDU1, "largeur en pixels = %d \n", pixel_counter);
+		chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %d \n", get_distance_cm());
 		pixel_counter = 0;
 
 	}
@@ -94,6 +95,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 
 float get_distance_cm(void){
+	distance_cm = PXTOCM/pixel_counter;
 	return distance_cm;
 }
 
