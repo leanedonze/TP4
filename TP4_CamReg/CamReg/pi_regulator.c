@@ -14,6 +14,9 @@
 #define	KI		0
 #define GOAL	10
 
+static float error = 0;
+static float sum_error = 0;
+
 static THD_WORKING_AREA(waPiRegulator, 256);
 static THD_FUNCTION(PiRegulator, arg) {
 
@@ -23,12 +26,15 @@ static THD_FUNCTION(PiRegulator, arg) {
     systime_t time;
 
     int16_t speed = 0;
-    float error = 0;
-    float sum_error = 0;
+
 
     while(1){
         time = chVTGetSystemTime();
-        error = get_distance_cm() - GOAL;
+        if (get_new_count() == true){
+        	error = get_distance_cm() - GOAL;
+        }
+
+        chprintf((BaseSequentialStream *)&SDU1, "error = %f \n", error);
         sum_error += error;
         speed = KP*error + KI*sum_error;
 

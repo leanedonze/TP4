@@ -14,6 +14,7 @@
 
 static float distance_cm = 0;
 static uint16_t pixel_counter = 0;
+static bool new_count = false;
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -63,6 +64,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 		img_buff_ptr = dcmi_get_last_image_ptr();
 		for (unsigned int i = 0; i < 2*IMAGE_BUFFER_SIZE; i+=2)
 		{
+			new_count = false;
 			image[i/2] = img_buff_ptr[i] & (0b11111000);
 			if (image[i/2] < THRESHOLD)
 				++pixel_counter;
@@ -76,6 +78,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 		}
+		new_count = true;
 		/*for (unsigned int i = 0; i < IMAGE_BUFFER_SIZE; ++i){
 			if (image[i] - image[i+10] > 50){
 				pixel_counter = i;
@@ -86,9 +89,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 			}
 		}*/
 
-		chprintf((BaseSequentialStream *)&SDU1, "largeur en pixels = %d \n", pixel_counter);
-		chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %d \n", get_distance_cm());
-		pixel_counter = 0;
+		//chprintf((BaseSequentialStream *)&SDU1, "largeur en pixels = %d \n", pixel_counter);
+		chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %f \n", get_distance_cm());
+
 
 	}
    }
@@ -102,6 +105,10 @@ float get_distance_cm(void){
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+}
+
+bool get_new_count(void){
+	return new_count;
 }
 
 
