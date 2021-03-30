@@ -153,6 +153,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 		//converts the width into a distance between the robot and the camera
 		if(lineWidth){
 			distance_cm = PXTOCM/lineWidth;
+			chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %f \n", distance_cm);
 		}
 
 		if(send_to_computer){
