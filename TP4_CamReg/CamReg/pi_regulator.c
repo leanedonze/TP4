@@ -11,7 +11,7 @@
 #include <process_image.h>
 
 #define	KP		800
-#define	KI		0
+#define	KI		3.5
 #define GOAL	10
 
 static float error = 0;
@@ -30,18 +30,17 @@ static THD_FUNCTION(PiRegulator, arg) {
 
     while(1){
         time = chVTGetSystemTime();
-        if (get_new_count() == true){
-        	error = get_distance_cm() - GOAL;
-        }
+        error = get_distance_cm() - GOAL;
 
-        chprintf((BaseSequentialStream *)&SDU1, "error = %f \n", error);
+
+        //chprintf((BaseSequentialStream *)&SDU1, "error = %f \n", error);
         sum_error += error;
         speed = KP*error + KI*sum_error;
 
         
         //applies the speed from the PI regulator
-		//right_motor_set_speed(speed);
-		//left_motor_set_speed(speed);
+		right_motor_set_speed(speed);
+		left_motor_set_speed(speed);
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));

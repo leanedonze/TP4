@@ -8,13 +8,14 @@
 
 #include <process_image.h>
 
-#define PXTOCM		1570
+#define PXTOCM		1570.0f
 #define THRESHOLD	20
 
 
 static float distance_cm = 0;
 static uint16_t pixel_counter = 0;
-static bool new_count = false;
+static uint16_t last_pixel_counter = 0;
+
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -62,12 +63,12 @@ static THD_FUNCTION(ProcessImage, arg) {
         chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565    
 		img_buff_ptr = dcmi_get_last_image_ptr();
+		uint16_t counter=0;
 		for (unsigned int i = 0; i < 2*IMAGE_BUFFER_SIZE; i+=2)
 		{
-			new_count = false;
 			image[i/2] = img_buff_ptr[i] & (0b11111000);
 			if (image[i/2] < THRESHOLD)
-				++pixel_counter;
+				++counter;
 
 			/*if (image[i/2-1] - image[i/2] > 50){
 				pixel_counter = i/2;
@@ -78,7 +79,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 		}
-		new_count = true;
+
 		/*for (unsigned int i = 0; i < IMAGE_BUFFER_SIZE; ++i){
 			if (image[i] - image[i+10] > 50){
 				pixel_counter = i;
@@ -90,7 +91,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 		}*/
 
 		//chprintf((BaseSequentialStream *)&SDU1, "largeur en pixels = %d \n", pixel_counter);
-		chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %f \n", get_distance_cm());
+		//chprintf((BaseSequentialStream *)&SDU1, "largeur en cm = %f \n", get_distance_cm());
+		pixel_counter = counter;
+		counter = 0;
 
 
 	}
@@ -107,8 +110,5 @@ void process_image_start(void){
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
 }
 
-bool get_new_count(void){
-	return new_count;
-}
 
 

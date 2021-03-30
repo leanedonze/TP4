@@ -3,6 +3,5 @@
 
 float get_distance_cm(void);
 void process_image_start(void);
-bool get_new_count(void);
 
 #endif /* PROCESS_IMAGE_H */
